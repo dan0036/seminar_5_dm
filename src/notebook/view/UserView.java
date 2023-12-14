@@ -3,6 +3,7 @@ package notebook.view;
 import notebook.controller.UserController;
 import notebook.model.User;
 import notebook.util.Commands;
+import notebook.util.mapper.Prompt;
 import notebook.util.mapper.UserValidation;
 
 import java.util.Scanner;
@@ -18,16 +19,16 @@ public class UserView {
         Commands com;
 
         while (true) {
-            String command = prompt("Введите команду: ");
+            String command = Prompt.prompt("Введите команду: ");
             com = Commands.valueOf(command);
             if (com == Commands.EXIT) return;
             switch (com) {
                 case CREATE:
-                    User u = createUser();
+                    User u = userController.createUser();
                     userController.saveUser(u);
                     break;
                 case READ:
-                    String id = prompt("Идентификатор пользователя: ");
+                    String id = Prompt.prompt("Идентификатор пользователя: ");
                     try {
                         User user = userController.readUser(Long.parseLong(id));
                         System.out.println(user);
@@ -40,29 +41,21 @@ public class UserView {
                     System.out.println(userController.readAll());
                     break;
                 case UPDATE:
-                    String userId = prompt("Enter user id: ");
-                    userController.updateUser(userId, createUser());
+                    String userId = Prompt.prompt("Enter user id: ");
+                    userController.updateUser(userId, userController.createUser());
+                case DELETE:
+                    String id2 = Prompt.prompt("Enter user id: ");
+                    userController.deleteUser(id2);
+
             }
         }
     }
 
-    private String prompt(String message) {
-        Scanner in = new Scanner(System.in);
-        System.out.print(message);
-        return in.nextLine();
-    }
+//    private String prompt(String message) {
+//        Scanner in = new Scanner(System.in);
+//        System.out.print(message);
+//        return in.nextLine();
+//    }
 
-    private User createUser() {
-        UserValidation userValidation = new UserValidation();
 
-        String firstName = prompt("Имя: ");
-        String lastName = prompt("Фамилия: ");
-        String phone = prompt("Номер телефона: ");
-        User user = new User(firstName, lastName, phone);
-        if (userValidation.valid(user)){
-            return user;
-        } else {
-            throw new IllegalArgumentException("Введены некорректные данные");
-        }
-    }
 }
